@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    wit (5.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  wit
+
+BUNDLED WITH
+   1.13.5
