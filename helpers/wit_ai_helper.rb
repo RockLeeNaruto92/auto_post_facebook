@@ -1,5 +1,6 @@
 require "wit"
 require "pry"
+require "fb_graph"
 
 module WitAiHelper
   def actions
@@ -21,7 +22,7 @@ module WitAiHelper
       postFacebook: -> (request) {
         context = request["context"]
         status = request["entities"]["message_body"].first["value"]
-        postFacebook(status, @link)
+        postFacebook(nil, @link)
 
         context["answer"] = "Do you want to post to facebook with that status?"
         return request["context"]
@@ -35,6 +36,11 @@ module WitAiHelper
 
   def postFacebook status, link
     status ||= @status
-    puts "post status: #{status} and link"
+    access_token = "EAACEdEose0cBAJEAJXddevAXJnWgy8J3FUzERbUbFsmIT79GwJ9y5zKCQLOEHU1tT8ipZBeAMls951F76jePLZBFKzEOHvxfxa8h77qGJUPen8Ke2MLiitkkq1RfEkr4qPva5jFF2h3cZBgZCLOSukOn7Uvm6mO5OmnB1npJCZAq3wdbBEqKN8jNZBna6rZB2Pl17oZB49RRGMF1gHYnkxxl"
+    me = FbGraph::User.me(access_token)
+    me.feed!(
+      message: status,
+      link: link
+    )
   end
 end
