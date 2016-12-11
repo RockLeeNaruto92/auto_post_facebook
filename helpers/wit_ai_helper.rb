@@ -1,6 +1,6 @@
 require "wit"
 require "pry"
-require "fb_graph"
+require "koala"
 
 module WitAiHelper
   def actions
@@ -36,11 +36,42 @@ module WitAiHelper
 
   def postFacebook status, link
     status ||= @status
-    access_token = "EAACEdEose0cBAJEAJXddevAXJnWgy8J3FUzERbUbFsmIT79GwJ9y5zKCQLOEHU1tT8ipZBeAMls951F76jePLZBFKzEOHvxfxa8h77qGJUPen8Ke2MLiitkkq1RfEkr4qPva5jFF2h3cZBgZCLOSukOn7Uvm6mO5OmnB1npJCZAq3wdbBEqKN8jNZBna6rZB2Pl17oZB49RRGMF1gHYnkxxl"
-    me = FbGraph::User.me(access_token)
-    me.feed!(
-      message: status,
-      link: link
-    )
+
+
+    graph = Koala::Facebook::API.new facebook_access_token
+    # getting groups of interest
+    groups = graph.get_connections("me", "groups").select do |group|
+      group_names.include? group["name"]
+    end
+
+    groups.each_with_index do |group, index|
+      puts "[#{index}/#{groups.size}] Posting to group #{group["name"]}."
+      graph.put_picture(default_image, {message: generate_message(status, link)},
+        group["id"])
+    end
+  end
+
+  def default_image
+    "https://u-rara.jp/wp-content/uploads/2016/09/ThinkstockPhotos-75627078-e1474849735266.jpg"
+  end
+
+  def generate_message status, link
+    <<-EOS
+#{status}
+
+#{link}
+    EOS
+  end
+
+  def facebook_access_token
+    "EAACEdEose0cBAFNVrarPyRu9tFcxNzMSCAoBRZCE2kZB3nP6H2JLZBuPEKtqbSOgQ9r5xZATtUwzzZBlwTvgGuYrI2tdP5Bu6mhvAwvmdB87P1SPc4oIZBVxeNbvorUZCCE1jI4q95vdxnRGPB9gLv6ZB1mBswBfdwV2eviGxj1SBZAhvf4koahSC66ZBvGfWSOVZBwkB6dZC3MBisTZCM43iRZA1h"
+  end
+
+  def wit_ai_access_token
+    "WLICQUYCU3SWUJJX4BEX6MU5KYRBQAHV"
+  end
+
+  def group_names
+    ["Test Demo"]
   end
 end
