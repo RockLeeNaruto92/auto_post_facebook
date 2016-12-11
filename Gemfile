@@ -2,4 +2,4 @@ source "https://rubygems.org"
 
 gem "wit"
 gem "pry"
-gem "fb_graph"
+gem "koala"
